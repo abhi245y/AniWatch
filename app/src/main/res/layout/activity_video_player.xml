@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.VideoPlayerActivity">
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/exoPlayerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:show_timeout="2000"
+        android:background="@color/black"
+        app:controller_layout_id="@layout/exo_custom_controls" />
+
+    <ProgressBar
+        android:visibility="visible"
+        android:id="@+id/buffering_progress"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/exoPlayerView"
+        app:layout_constraintEnd_toEndOf="@+id/exoPlayerView"
+        app:layout_constraintStart_toStartOf="@+id/exoPlayerView"
+        app:layout_constraintTop_toTopOf="@+id/exoPlayerView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

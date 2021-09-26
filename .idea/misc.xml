@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable-v24/ic_baseline_skip_previous_24.xml" value="0.39895833333333336" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.301953125" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable-v24/ic_sharp_play_arrow_24.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/circular_bg.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/gradinat_bg.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/ic_launcher_background.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/ic_outline_play_circle_24.xml" value="0.301953125" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/ic_round_download_24.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/ic_round_pause_24.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/ic_round_play_arrow_24.xml" value="0.301953125" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/ic_round_search_24.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/ic_toggle.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/ic_toggle_bg.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/progress_bar.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/drawable/progress_drawable.xml" value="0.40260416666666665" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout-model/search_result_model.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/activity_anime_details.xml" value="0.536" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/activity_deep_link_handler.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/activity_donwloads.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/activity_main.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/activity_recent_released.xml" value="0.4" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/activity_search.xml" value="0.4" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/activity_video_player.xml" value="0.3828125" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/anime_details.xml" value="0.4" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/downloads_list_model.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/episodes_view_model.xml" value="0.3828125" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/eps_drop_down.xml" value="0.28984375" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/exo_custom_controls.xml" value="0.3828125" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/list_item.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/recent_released_anime_model.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/search_res_vmodel.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/search_rv_model.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/show_details_popup.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/video_view.xml" value="0.38645833333333335" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/layout/view_loading_video.xml" value="0.3723958333333333" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.23229166666666667" />
+        <entry key="..\:/Users/rocki/AndroidStudioProjects/AniWatch/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.23229166666666667" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

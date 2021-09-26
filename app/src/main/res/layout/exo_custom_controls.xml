@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/playerControls"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#31000000"
+    tools:ignore="HardcodedText" >
+
+
+    <TextView
+        android:id="@+id/title_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        android:hint="Episode name"
+        android:padding="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:ignore="TextContrastCheck" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/controls_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exo_prev"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginEnd="12dp"
+            android:background="@android:color/transparent"
+            app:icon="@drawable/exo_ic_skip_previous"
+            app:iconGravity="textStart"
+            app:iconTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/exo_play_pause"
+            app:layout_constraintEnd_toStartOf="@+id/exo_play_pause"
+            app:layout_constraintTop_toTopOf="@+id/exo_play_pause"
+            app:layout_constraintVertical_bias="0.0"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ToggleButton
+            android:id="@+id/exo_play_pause"
+            style="@style/toggleButton"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@drawable/ic_toggle_bg"
+            android:backgroundTint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exo_next"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="12dp"
+            android:background="@android:color/transparent"
+            app:icon="@drawable/exo_ic_skip_next"
+            app:iconGravity="textStart"
+            app:iconTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/exo_play_pause"
+            app:layout_constraintStart_toEndOf="@+id/exo_play_pause"
+            app:layout_constraintTop_toTopOf="@+id/exo_play_pause"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+
+        <LinearLayout
+            android:id="@+id/exo_timing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/exo_progress"
+            app:layout_constraintStart_toStartOf="@+id/exo_progress">
+
+            <TextView
+                android:id="@+id/exo_position"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/_00_00"
+                tools:ignore="TextContrastCheck" />
+
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
+                android:hint="@string/forward_slash"
+                android:textColor="#979494"
+                tools:ignore="TextContrastCheck" />
+
+            <TextView
+                android:id="@+id/exo_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:hint="@string/_00_00"
+                android:textColor="#979494"
+                tools:ignore="TextContrastCheck" />
+
+        </LinearLayout>
+
+        <com.google.android.exoplayer2.ui.DefaultTimeBar
+            android:id="@+id/exo_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="38dp"
+            app:bar_height="2dp"
+            app:buffered_color="#979494"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:played_color="#FF0000"
+            app:scrubber_color="#FF0000"
+            app:unplayed_color="#2F4E4E4E"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <SeekBar
+            android:id="@+id/bright_seek"
+            android:layout_width="160dp"
+            android:layout_height="8dp"
+            android:layout_centerInParent="true"
+            android:max="255"
+            android:layout_marginStart="-50dp"
+            android:progressDrawable="@drawable/progress_drawable"
+            android:rotation="-90"
+            android:thumb="@color/browser_actions_bg_grey"
+            android:thumbTint="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.498" />
+
+        <SeekBar
+            android:id="@+id/vol_seek"
+            android:layout_width="160dp"
+            android:layout_height="8dp"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="-50dp"
+            android:progressDrawable="@drawable/progress_drawable"
+            android:rotation="-90"
+            android:thumb="@color/browser_actions_bg_grey"
+            android:thumbTint="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/exo_progress"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.498" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="68dp"
+            android:layout_marginBottom="64dp"
+            android:src="@drawable/ic_round_volume_down_24"
+            app:layout_constraintBottom_toTopOf="@+id/vol_seek"
+            app:layout_constraintStart_toStartOf="@+id/vol_seek" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="68dp"
+            android:layout_marginBottom="64dp"
+            android:src="@drawable/ic_round_wb_sunny_24"
+            app:layout_constraintBottom_toTopOf="@+id/bright_seek"
+            app:layout_constraintEnd_toEndOf="@+id/bright_seek" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="40dp"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <View
+                android:visibility="gone"
+                android:id="@+id/paddingTop"
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/video_list_rv"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"/>
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
