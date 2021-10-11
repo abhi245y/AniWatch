@@ -14,6 +14,20 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="Theme.AniWatch.ActionBar" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">#000000</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
     <style name="Widget.Button.Toggle" parent="android:Widget">
         <item name="android:background">@drawable/ic_toggle_bg</item>
         <item name="android:disabledAlpha">?android:attr/disabledAlpha</item>
@@ -24,6 +38,19 @@
         <item name="android:textOn" />
         <item name="android:textOff" />
     </style>
+
+    <style name="Widget.Button.MyList" parent="android:Widget">
+        <item name="android:background">@drawable/my_list_toggle_bg</item>
+        <item name="android:disabledAlpha">?android:attr/disabledAlpha</item>
+    </style>
+
+    <style name="MyListToggleButton"  parent="Theme.MaterialComponents.DayNight">
+        <item name="android:buttonStyleToggle">@style/Widget.Button.MyList</item>
+        <item name="android:textOn" />
+        <item name="android:textOff" />
+    </style>
+
+
 
     <style name="VideoPlayerTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowNoTitle">true</item>

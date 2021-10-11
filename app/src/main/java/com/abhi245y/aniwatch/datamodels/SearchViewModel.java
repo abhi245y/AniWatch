@@ -10,16 +10,10 @@ import lombok.Data;
 @Data
 public class SearchViewModel implements Parcelable {
 
-    String anime_name;
-    String gogo_id;
-    String poster_link;
-    String total_ep;
+    AnimeMongo animeMongo;
+
 
     protected SearchViewModel(Parcel in) {
-        anime_name = in.readString();
-        gogo_id = in.readString();
-        poster_link = in.readString();
-        total_ep = in.readString();
     }
 
     public static final Creator<SearchViewModel> CREATOR = new Creator<SearchViewModel>() {
@@ -41,9 +35,5 @@ public class SearchViewModel implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(anime_name);
-        parcel.writeString(gogo_id);
-        parcel.writeString(poster_link);
-        parcel.writeString(total_ep);
     }
 }

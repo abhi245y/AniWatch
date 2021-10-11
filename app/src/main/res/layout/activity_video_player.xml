@@ -10,12 +10,14 @@
         android:id="@+id/exoPlayerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/black"
+        app:controller_layout_id="@layout/exo_custom_controls"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:show_timeout="2000"
-        android:background="@color/black"
-        app:controller_layout_id="@layout/exo_custom_controls" />
+        app:surface_type="texture_view" />
 
     <ProgressBar
         android:visibility="visible"
@@ -28,5 +30,19 @@
         app:layout_constraintEnd_toEndOf="@+id/exoPlayerView"
         app:layout_constraintStart_toStartOf="@+id/exoPlayerView"
         app:layout_constraintTop_toTopOf="@+id/exoPlayerView" />
+
+    <ImageView
+        android:id="@+id/next_ep_thumbnail"
+        android:layout_width="177dp"
+        android:layout_height="100dp"
+        android:background="#2B2B2B"
+        android:visibility="visible"
+        android:layout_marginEnd="52dp"
+        android:layout_marginBottom="110dp"
+        app:layout_constraintBottom_toBottomOf="@+id/exoPlayerView"
+        app:layout_constraintEnd_toEndOf="@+id/exoPlayerView"
+        tools:ignore="ContentDescription" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

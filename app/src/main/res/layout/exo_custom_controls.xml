@@ -18,6 +18,7 @@
         android:layout_marginEnd="8dp"
         android:hint="Episode name"
         android:padding="8dp"
+        android:visibility="visible"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
@@ -26,51 +27,40 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/controls_container"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/exo_prev"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:layout_marginEnd="12dp"
-            android:background="@android:color/transparent"
-            app:icon="@drawable/exo_ic_skip_previous"
+            android:id="@+id/rewind_10_sec_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="236dp"
+            android:background="?selectableItemBackgroundBorderless"
+            app:icon="@drawable/ic_rewind_10"
             app:iconGravity="textStart"
+            app:iconSize="40dp"
             app:iconTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/exo_play_pause"
-            app:layout_constraintEnd_toStartOf="@+id/exo_play_pause"
-            app:layout_constraintTop_toTopOf="@+id/exo_play_pause"
-            app:layout_constraintVertical_bias="0.0"
-            tools:ignore="SpeakableTextPresentCheck" />
-
-        <ToggleButton
-            android:id="@+id/exo_play_pause"
-            style="@style/toggleButton"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:background="@drawable/ic_toggle_bg"
-            android:backgroundTint="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/bright_seek"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/bright_seek"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/exo_next"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:layout_marginStart="12dp"
-            android:background="@android:color/transparent"
-            app:icon="@drawable/exo_ic_skip_next"
+            android:id="@+id/forward_10_sec_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="236dp"
+            android:background="?selectableItemBackgroundBorderless"
+            app:icon="@drawable/ic_forward_10"
             app:iconGravity="textStart"
+            app:iconSize="40dp"
             app:iconTint="@color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/exo_play_pause"
-            app:layout_constraintStart_toEndOf="@+id/exo_play_pause"
-            app:layout_constraintTop_toTopOf="@+id/exo_play_pause"
+            app:layout_constraintBottom_toBottomOf="@+id/vol_seek"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/vol_seek"
             tools:ignore="SpeakableTextPresentCheck" />
-
 
         <LinearLayout
             android:id="@+id/exo_timing"
@@ -115,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="38dp"
+            android:layout_marginBottom="48dp"
             app:bar_height="2dp"
             app:buffered_color="#979494"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -179,35 +169,192 @@
             app:layout_constraintEnd_toEndOf="@+id/bright_seek" />
 
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exo_playback_speed"
+            android:layout_width="140dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="44dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Speed (1x)"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            app:icon="@drawable/ic_round_speed_24"
+            app:iconGravity="textStart"
+            app:iconSize="18dp"
+            app:iconTint="@color/white"
+            app:layout_constraintStart_toEndOf="@+id/skip_intro_btn"
+            app:layout_constraintTop_toBottomOf="@+id/exo_progress" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/skip_intro_btn"
+            android:layout_width="130dp"
+            android:layout_height="42dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Skip Intro"
+            app:rippleColor="@color/ripple_color"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            app:iconTint="@color/white"
+            app:layout_constraintStart_toStartOf="@+id/exo_progress"
+            app:layout_constraintTop_toBottomOf="@+id/exo_progress" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ep_list_btn"
+            android:layout_width="130dp"
+            android:layout_height="42dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Episodes"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:clickable="false"
+            app:icon="@drawable/noun_episodes"
+            app:iconGravity="textStart"
+            app:iconSize="18dp"
+            app:iconTint="@color/white"
+            app:layout_constraintEnd_toStartOf="@+id/anime_more_info_btn"
+            app:layout_constraintStart_toEndOf="@+id/exo_playback_speed"
+            app:layout_constraintTop_toBottomOf="@+id/exo_progress" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/anime_more_info_btn"
+            android:layout_width="150dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="156dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="More Info"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            app:icon="@drawable/ic_outline_info_24"
+            app:iconSize="18dp"
+            app:iconTint="@color/white"
+            app:layout_constraintEnd_toEndOf="@+id/exo_progress"
+            app:layout_constraintTop_toBottomOf="@+id/exo_progress" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exo_next"
+            android:layout_width="130dp"
+            android:layout_height="42dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Next Ep"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            app:rippleColor="@color/ripple_color"
+            app:iconGravity="textStart"
+            app:icon="@drawable/exo_icon_next"
+            app:iconSize="20dp"
+            app:iconTint="@color/white"
+            app:layout_constraintEnd_toEndOf="@+id/exo_progress"
+            app:layout_constraintTop_toBottomOf="@+id/exo_progress" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exo_next_thumb"
+            android:layout_width="177dp"
+            android:layout_height="42dp"
+            android:layout_marginBottom="68dp"
+            android:backgroundTint="@android:color/transparent"
+            android:background="@android:color/transparent"
+            android:text="@string/next_ep"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:layout_marginEnd="52dp"
+            android:visibility="invisible"
+            app:icon="@drawable/exo_ic_skip_next"
+            app:iconGravity="textStart"
+            app:iconSize="20dp"
+            app:iconTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#72000000"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="40dp"
+        app:behavior_peekHeight="0dp"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+        <include
+            layout="@layout/anime_more_info"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <View
-                android:visibility="gone"
-                android:id="@+id/paddingTop"
-                android:layout_width="match_parent"
-                android:layout_height="100dp" />
+        <View
+            android:id="@+id/paddingTop"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/episodes_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="0dp"
+                android:padding="10dp"
+                android:layout_margin="5dp"
+                android:layout_height="wrap_content"
+                android:text="Episodes"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toStartOf="@+id/close_episode_list_btn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/close_episode_list_btn"
+                android:layout_width="35dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:background="?selectableItemBackgroundBorderless"
+                app:icon="@drawable/ic_round_close_24"
+                app:iconGravity="textStart"
+                app:iconSize="35dp"
+                app:iconTint="@color/white"
+                app:layout_constraintBottom_toTopOf="@+id/video_list_rv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView4"
+                app:layout_constraintVertical_bias="0.0" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/video_list_rv"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"/>
+                android:layout_height="0dp"
+                android:padding="10dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    </androidx.core.widget.NestedScrollView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ToggleButton
+        android:id="@+id/exo_play_pause"
+        style="@style/toggleButton"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:background="@drawable/ic_toggle_bg"
+        android:backgroundTint="@android:color/white"
+        app:layout_anchor="@+id/controls_container"
+        app:layout_anchorGravity="center" />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

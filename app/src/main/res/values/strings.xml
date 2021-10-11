@@ -44,4 +44,13 @@
     <string name="note_if_download_is_stuck_with_no_progress_try_pause_and_then_resume">Note: If Download is stuck with no progress try \'Pause\' and then \'Resume\'</string>
     <string name="_00_00">00:00</string>
     <string name="forward_slash">/</string>
+    <string name="anime_search">Anime Search</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="create_user">Create User</string>
+    <string name="update_notice">This version is still in works. It was released to address on going issue with getting Video link.\n\n<b>NOTE</b>\n\nSome links are still not working its an issue with download link got from gogoanime.\n\nThere are still some bugs and partially working features.\n\nI am working on.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="lonely">So lonely</string>
+    <string name="getting_video_link">Searching Video</string>
+    <string name="next_ep">Next Ep</string>
 </resources>

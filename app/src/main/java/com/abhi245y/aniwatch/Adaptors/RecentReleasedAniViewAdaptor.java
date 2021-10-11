@@ -13,7 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abhi245y.aniwatch.R;
-import com.abhi245y.aniwatch.datamodels.AniApiRecentListModel;
+import com.abhi245y.aniwatch.datamodels.AnimeMongo;
+import com.abhi245y.aniwatch.datamodels.RecentReleasedAniViewModel;
 import com.abhi245y.aniwatch.ui.AnimeDetailsActivity;
 import com.bumptech.glide.Glide;
 
@@ -21,15 +22,13 @@ import java.util.ArrayList;
 
 public class RecentReleasedAniViewAdaptor extends  RecyclerView.Adapter<RecentReleasedAniViewAdaptor.ViewHolder>{
 
-    ArrayList<AniApiRecentListModel.RecentReleasesBean> recentReleasesBeans;
+    ArrayList<RecentReleasedAniViewModel> recentReleasesBeans;
     Context context;
-    String current_domain;
 
     @SuppressLint("NotifyDataSetChanged")
-    public RecentReleasedAniViewAdaptor(ArrayList<AniApiRecentListModel.RecentReleasesBean> recentReleasesBeans, Context context, String current_domain) {
+    public RecentReleasedAniViewAdaptor(ArrayList<RecentReleasedAniViewModel> recentReleasesBeans, Context context) {
         this.recentReleasesBeans = recentReleasesBeans;
         this.context = context;
-        this.current_domain = current_domain;
         notifyDataSetChanged();
     }
 
@@ -41,18 +40,15 @@ public class RecentReleasedAniViewAdaptor extends  RecyclerView.Adapter<RecentRe
 
     @Override
     public void onBindViewHolder(@NonNull RecentReleasedAniViewAdaptor.ViewHolder holder, int position) {
-        AniApiRecentListModel.RecentReleasesBean res = recentReleasesBeans.get(position);
-
-        Glide.with(context).load(res.getImg_link()).placeholder(R.drawable.placeholder1).into(holder.aniCoverImg);
-        holder.aniTitle.setText(res.getTitle());
-        holder.aniEpisode.setText(res.getEp_num());
+        AnimeMongo res = recentReleasesBeans.get(position).getAnimeMongo();
+        Glide.with(context).load(res.getImgLink()).centerCrop().placeholder(R.drawable.placeholder1).into(holder.aniCoverImg);
+        holder.aniTitle.setText(res.getTitleName());
+        holder.aniEpisode.setText(recentReleasesBeans.get(position).getCurrent_ep());
 
     }
 
     @Override
-    public int getItemCount() {
-        return recentReleasesBeans.size();
-    }
+    public int getItemCount() { return recentReleasesBeans.size(); }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView aniCoverImg;
@@ -62,25 +58,19 @@ public class RecentReleasedAniViewAdaptor extends  RecyclerView.Adapter<RecentRe
 
             aniCoverImg = itemView.findViewById(R.id.ani_cover_img);
             aniTitle = itemView.findViewById(R.id.ani_title_tv);
+            aniTitle.setSelected(true);
             aniEpisode = itemView.findViewById(R.id.ani_released_ep_tv);
 
             itemView.setOnClickListener(view -> {
-                AniApiRecentListModel.RecentReleasesBean recentReleasesBean = recentReleasesBeans.get(getAdapterPosition());
-                Intent intent = new Intent(context, AnimeDetailsActivity.class);
-                intent.putExtra("anime_name", recentReleasesBean.getTitle().toLowerCase().replaceAll("'","").replaceAll(":",""));
-                intent.putExtra("activity_name", "recent_release");
-                intent.putExtra("current_domain", current_domain);
-                intent.putExtra("ep_link", recentReleasesBean.getEp_link());
-                intent.putExtra("poster_link", recentReleasesBean.getImg_link());
-                if(!recentReleasesBean.getEp_num().contains("Episode ")){
-                    intent.putExtra("current_ep", "1");
-                    intent.putExtra("total_ep", "1");
-
-                }else{
-                    intent.putExtra("current_ep", recentReleasesBean.getEp_num().replace("Episode ", "").replace(" - Uncen",""));
-                    intent.putExtra("total_ep", recentReleasesBean.getEp_num().replace("Episode ","").replace(" - Uncen",""));
+                RecentReleasedAniViewModel recentReleasesBean = recentReleasesBeans.get(getBindingAdapterPosition());
+                Intent animeDetails = new Intent(context, AnimeDetailsActivity.class);
+                animeDetails.putExtra("animeData", recentReleasesBean.getAnimeMongo());
+                if (recentReleasesBean.getCurrent_ep().contains("Movie")){
+                    animeDetails.putExtra("current_ep", "1");
+                }else {
+                    animeDetails.putExtra("current_ep", recentReleasesBean.getCurrent_ep().replace("Episode ", "").replace(" - Uncen", ""));
                 }
-                context.startActivity(intent);
+                context.startActivity(animeDetails);
             });
 
         }

@@ -3,6 +3,9 @@ package com.abhi245y.aniwatch.ui;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -36,22 +39,39 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.abhi245y.aniwatch.R;
+import com.abhi245y.aniwatch.backend.MongoDBAuth;
 import com.abhi245y.aniwatch.backend.MyPreferences;
 import com.abhi245y.aniwatch.datamodels.AniApiDownloadModel;
+import com.abhi245y.aniwatch.datamodels.AniApiTotalEpisodesCallModel;
 import com.abhi245y.aniwatch.datamodels.AniApiYTLinkModel;
+import com.abhi245y.aniwatch.datamodels.AnimeMongo;
 import com.abhi245y.aniwatch.datamodels.KitsuApiSearchModel;
 import com.abhi245y.aniwatch.datamodels.PlayerActivityDataModel;
+import com.abhi245y.aniwatch.datamodels.UsersModelMongo;
 import com.abhi245y.aniwatch.services.AniWatchApiService;
 import com.abhi245y.aniwatch.services.KitsuApiService;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.tonyodev.fetch2.Fetch;
-import com.tonyodev.fetch2.FetchConfiguration;
 import com.tonyodev.fetch2.NetworkType;
 import com.tonyodev.fetch2.Request;
 
-import java.util.ArrayList;
+import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
+
+import io.realm.mongodb.App;
+import io.realm.mongodb.AppConfiguration;
+import io.realm.mongodb.Credentials;
+import io.realm.mongodb.User;
+import io.realm.mongodb.mongo.MongoCollection;
+import io.realm.mongodb.mongo.MongoDatabase;
+import io.realm.mongodb.mongo.iterable.FindIterable;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,50 +82,61 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class AnimeDetailsActivity extends AppCompatActivity {
 
     ImageView coverImage;
-    TextView showTitle, releaseYear,epsDuration, ageRating, nEpisodes, showStatus, synopsisText ;
-    MaterialButton playBtn, downloadBtn, ytPlayBtn, showDownloads;
+    TextView showTitle, releaseYear,epsDuration, ageRating, nEpisodes, showStatus, synopsisText, rating ;
+    MaterialButton playBtn, downloadBtn, ytPlayBtn, showDownloads, sortEpListBtn;
     AutoCompleteTextView epSelection;
     LinearLayout mainLay;
     ProgressBar progressCircular;
     VideoView ytVideo;
-    ToggleButton playPause;
+    ToggleButton playPause, addToList;
     SeekBar seekProgress;
     Handler mHandler,handler;
     ConstraintLayout controlsContainer;
     ProgressBar bufferingProgress;
+    AnimeMongo animeMongo;
 
     View loadingView;
-    public boolean isFirstTime;
+    public boolean isFirstTime, isReversed = false;
 
     LinearLayout video_lay;
 
     String BASE_URL_ANI_API = "https://aniwatch-api.herokuapp.com/";
+    String BASE_URL_kitsu_API = "https://kitsu.io/api/edge/";
     Retrofit aniRetrofit;
     AniWatchApiService aniWatchApiService;
     String videoLink = "null";
-    String animeName, totalEps, currentEp, fromActivity, targetEp, slug;
+    String animeName, totalEps, currentEp;
 
     double current_pos, total_duration;
     boolean isVisible = true;
 
+    @SuppressLint("InflateParams")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_anime_details);
         isFirstTime = MyPreferences.isFirst(AnimeDetailsActivity.this);
-        animeName = getIntent().getStringExtra("anime_name");
-        totalEps = getIntent().getStringExtra("total_ep");
+        animeMongo = getIntent().getParcelableExtra("animeData");
+        animeName = animeMongo.getTitleName();
         currentEp = getIntent().getStringExtra("current_ep");
-        fromActivity = getIntent().getStringExtra("activity_name");
+
 
         loadingView = getLayoutInflater().inflate(R.layout.view_loading_video, null);
 
         Toast.makeText(this, "got: " + animeName, Toast.LENGTH_SHORT).show();
 
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(25, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .build();
+
         aniRetrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL_ANI_API)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
         aniWatchApiService = aniRetrofit.create(AniWatchApiService.class);
 
         coverImage = findViewById(R.id.cover_img);
@@ -116,14 +147,16 @@ public class AnimeDetailsActivity extends AppCompatActivity {
         nEpisodes = findViewById(R.id.total_eps_text);
         showStatus = findViewById(R.id.status_text);
         synopsisText = findViewById(R.id.synopsis_text);
+        rating = findViewById(R.id.rating);
 
         mainLay = findViewById(R.id.mainLay);
         progressCircular = findViewById(R.id.progress_circular);
         mainLay.setVisibility(View.GONE);
         controlsContainer = findViewById(R.id.controls_container);
 
+        addToList = findViewById(R.id.add_to_list_btn);
+        sortEpListBtn = findViewById(R.id.sort_ep_list_btn);
         ytPlayBtn = findViewById(R.id.yt_pla_btn);
-
         playBtn = findViewById(R.id.play_btn);
         downloadBtn = findViewById(R.id.download_btn);
         epSelection = findViewById(R.id.episode_selection_view);
@@ -138,6 +171,18 @@ public class AnimeDetailsActivity extends AppCompatActivity {
         playPause = findViewById(R.id.play_pause_button);
         video_lay = findViewById(R.id.yt_video_lay);
 
+        new MongoDBAuth().checkPresentOnMyList(getApplicationContext(), animeMongo, addToList);
+
+
+        showTitle.setText(animeMongo.getTitleName());
+        releaseYear.setText(animeMongo.getReleased());
+        showStatus.setText(animeMongo.getStatus());
+        synopsisText.setText(animeMongo.getSummary());
+        epSelection.setText("Loading Episodes..");
+        playBtn.setText("Loading..");
+        downloadBtn.setText("Loading..");
+        epSelection.clearFocus();
+
         showDownloads.setOnClickListener(view -> {
 
             Intent downloadsActivity = new Intent(AnimeDetailsActivity.this, DownloadsActivity.class);
@@ -145,17 +190,9 @@ public class AnimeDetailsActivity extends AppCompatActivity {
 
         });
 
-        String BASE_URL_kitsu_API = "https://kitsu.io/api/edge/";
-        Retrofit kitsuRetrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL_kitsu_API)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
         hideLayout();
-
-        KitsuApiService kitsuApiService = kitsuRetrofit.create(KitsuApiService.class);
-
-        Call<KitsuApiSearchModel> kitsuApiSearchModelCall = kitsuApiService.search(animeName, "1");
+        getTotalEpisodes(animeMongo.getGogoVcID());
+        getDetailsFromKitsu(animeMongo.getTitleName());
 
         ytPlayBtn.setOnClickListener(view -> {
             coverImage.setVisibility(View.GONE);
@@ -165,6 +202,55 @@ public class AnimeDetailsActivity extends AppCompatActivity {
 
         });
 
+        addToList.setOnCheckedChangeListener((compoundButton, b) -> new MongoDBAuth().addToMyList(getApplicationContext(), animeMongo, "AnimeDetailsActivity", addToList));
+
+    }
+//
+//    private void checkHistory(String currentEpNum){
+//        App app = new MongoDBAuth().getMongoApp();
+//        String savedUsername= new MongoDBAuth().getUsername(this);
+//        app.loginAsync(Credentials.customFunction(new org.bson.Document("username", savedUsername)), new App.Callback<User>() {
+//            @Override
+//            public void onResult(App.Result<User> result) {
+//
+//                User user = app.currentUser();
+//                assert user != null;
+//                String gogVcId = animeMongo.getGogoVcID();
+//
+//                MongoDatabase mongoDatabase = user.getMongoClient("mongodb-atlas").getDatabase("main");
+//                CodecRegistry pojoCodecRegistry = fromRegistries(AppConfiguration.DEFAULT_BSON_CODEC_REGISTRY,
+//                        fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+//
+//                MongoCollection<UsersModelMongo> usersModelMongoMongoCollection = mongoDatabase.getCollection("users", UsersModelMongo.class).withCodecRegistry(pojoCodecRegistry);
+//
+//                usersModelMongoMongoCollection.findOne(new Document("username",  savedUsername).append("history_list.gogoVcID", gogVcId)
+//                        .append("history_list.currentEpNum",currentEpNum), ).getAsync(result1 -> {
+//                            try {
+//                                if (result1.get()!=null && result1.isSuccess()){
+//
+//                                    result1.get()
+//                                }
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                });
+//
+//
+//            }
+//        });
+//    }
+
+
+    private void getDetailsFromKitsu(String titleName) {
+        Retrofit kitsuRetrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL_kitsu_API)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        KitsuApiService kitsuApiService = kitsuRetrofit.create(KitsuApiService.class);
+
+        Call<KitsuApiSearchModel> kitsuApiSearchModelCall = kitsuApiService.search(titleName, "1");
 
         kitsuApiSearchModelCall.enqueue(new Callback<KitsuApiSearchModel>() {
             @SuppressLint("SetTextI18n")
@@ -172,47 +258,27 @@ public class AnimeDetailsActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<KitsuApiSearchModel> call, @NonNull Response<KitsuApiSearchModel> response) {
                 assert response.body() != null;
                 KitsuApiSearchModel.DataBean.AttributesBean attributesBean = response.body().getData().get(0).getAttributes();
-                slug = attributesBean.getSlug();
-                if(fromActivity.equals("recent_release") ) {
-                    if (getIntent().getStringExtra("current_domain").equals("vc") || getIntent().getStringExtra("current_domain").equals("pe")) {
-                        String gogo_id = getIntent().getStringExtra("ep_link").replace("-episode-"+currentEp,"").replace("/","");
-                        getDownloadLink(gogo_id, currentEp, getIntent().getStringExtra("ep_link"));
-                    }else {
-                        getDownloadLink(attributesBean.getSlug(), currentEp, getIntent().getStringExtra("ep_link"));
-                    }
-                }else {
-                    getDownloadLink(animeName, currentEp, "n/a");
-                }
                 try {
                     Glide.with(AnimeDetailsActivity.this).load(attributesBean.getCoverImage().getLarge()).placeholder(R.drawable.placeholder2).into(coverImage);
 
                 } catch (Exception e) {
                     coverImage.setBackgroundResource(R.drawable.placeholder2);
                 }
-                if (attributesBean.getTitles().getEn_jp()!=null) {
-                    showTitle.setText(String.valueOf(attributesBean.getTitles().getEn_jp()));
-                }else {
-                    showTitle.setText(String.valueOf(attributesBean.getTitles().getEn()));
-                }
-                releaseYear.setText(String.valueOf(attributesBean.getStartDate()));
+
                 if (attributesBean.getAgeRating().equals("PG")) {
                     ageRating.getBackground().setTint(Color.rgb(67, 158, 74));
                 } else if (attributesBean.getAgeRating().equals("R")) {
                     ageRating.getBackground().setTint(Color.rgb(255, 87, 91));
                 }
-                ageRating.setText(String.valueOf(attributesBean.getAgeRating()));
-                epsDuration.setText(attributesBean.getEpisodeLength() + " Min/Ep");
-                nEpisodes.setText(totalEps + " Episodes");
-                showStatus.setText(String.valueOf(attributesBean.getStatus()));
-                synopsisText.setText(String.valueOf(attributesBean.getSynopsis()));
 
-
-                ArrayList<String> epsList = new ArrayList<>();
-                for (int i = 0; i < Float.parseFloat(totalEps); i++) {
-                    String epsCount = "Episode " + (1 + i);
-                    epsList.add(epsCount);
+                if (animeMongo.getSummary().equals("")){
+                    synopsisText.setText(attributesBean.getSynopsis());
                 }
 
+                rating.setText(String.valueOf(attributesBean.getAverageRating()));
+
+                ageRating.setText(String.valueOf(attributesBean.getAgeRating()));
+                epsDuration.setText(attributesBean.getEpisodeLength() + " Min/Ep");
 
                 if (attributesBean.getYoutubeVideoId() != null) {
                     if (!attributesBean.getYoutubeVideoId().equals("")) {
@@ -229,9 +295,7 @@ public class AnimeDetailsActivity extends AppCompatActivity {
                                     playVideo(videoLink);
                                 }
 
-
                             }
-
                             @Override
                             public void onFailure(@NonNull Call<AniApiYTLinkModel> call, @NonNull Throwable t) {
 
@@ -240,24 +304,8 @@ public class AnimeDetailsActivity extends AppCompatActivity {
                     }
                 }
 
-                ArrayAdapter<String> epsDropArrayAdaptor = new ArrayAdapter<>(AnimeDetailsActivity.this, R.layout.eps_drop_down, epsList);
-                epSelection.setAdapter(epsDropArrayAdaptor);
-                if(currentEp.equals(totalEps)) {
-                    epSelection.setText("Episode " + totalEps, false);
-                }
-
-                epSelection.setOnItemClickListener((adapterView, view, i, l) -> {
-                    if(fromActivity.equals("recent_release")) {
-                        getDownloadLink(attributesBean.getSlug(), adapterView.getItemAtPosition(i).toString().replace("Episode ", ""), getIntent().getStringExtra("ep_link"));
-                    }else {
-                        getDownloadLink(animeName, adapterView.getItemAtPosition(i).toString().replace("Episode ", ""), "n/a");
-                    }
-                });
-
                 progressCircular.setVisibility(View.GONE);
                 mainLay.setVisibility(View.VISIBLE);
-
-
             }
 
             @Override
@@ -265,7 +313,86 @@ public class AnimeDetailsActivity extends AppCompatActivity {
 
             }
         });
+    }
 
+    private void getTotalEpisodes(String gogoVcID) {
+        Call<AniApiTotalEpisodesCallModel> aniApiTotalEpisodesCallModelCall = aniWatchApiService.getTotalEpisodes(gogoVcID);
+
+        aniApiTotalEpisodesCallModelCall.enqueue(new Callback<AniApiTotalEpisodesCallModel>() {
+            @Override
+            public void onResponse(@NonNull Call<AniApiTotalEpisodesCallModel> call, @NonNull Response<AniApiTotalEpisodesCallModel> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        totalEps = response.body().getTotal_eps();
+                        if (!totalEps.equals("0")) {
+                            nEpisodes.setText(totalEps + " Episodes");
+                            Log.d("AnimeDetailsActivity", "totalEps: " + totalEps);
+                            ArrayList<String> epsList = new ArrayList<>();
+                            for (int i = 0; i < Float.parseFloat(totalEps); i++) {
+                                String epsCount = "Episode " + (1 + i);
+                                epsList.add(epsCount);
+                            }
+
+
+                            if (currentEp.equals(totalEps)) {
+                                Collections.reverse(epsList);
+                                ArrayAdapter<String> epsDropArrayAdaptor = new ArrayAdapter<>(AnimeDetailsActivity.this, R.layout.eps_drop_down, epsList);
+                                epSelection.setAdapter(epsDropArrayAdaptor);
+                            } else {
+                                ArrayAdapter<String> epsDropArrayAdaptor = new ArrayAdapter<>(AnimeDetailsActivity.this, R.layout.eps_drop_down, epsList);
+                                epSelection.setAdapter(epsDropArrayAdaptor);
+                            }
+
+                            epSelection.setText(epsList.get(0), false);
+
+                            fetchDownloadLink(currentEp.replace("Episode ", ""));
+                            epSelection.setOnItemClickListener((adapterView, view, i, l) ->
+                                    fetchDownloadLink(adapterView.getItemAtPosition(i).toString().replace("Episode ", "")));
+                            loadingView.setVisibility(View.VISIBLE);
+
+                            sortEpListBtn.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (!isReversed) {
+                                        Collections.reverse(epsList);
+                                        Log.v("AnimeDetailsActivity", "Sorted List: " + epsList);
+                                        ArrayAdapter<String> epsDropArrayAdaptor = new ArrayAdapter<>(AnimeDetailsActivity.this, R.layout.eps_drop_down, epsList);
+                                        epSelection.setAdapter(epsDropArrayAdaptor);
+                                        epSelection.setText(epsList.get(0), false);
+                                        isReversed = true;
+                                    } else {
+                                        epsList.clear();
+                                        for (int i = 0; i < Float.parseFloat(totalEps); i++) {
+                                            String epsCount = "Episode " + (1 + i);
+                                            epsList.add(epsCount);
+                                        }
+                                        ArrayAdapter<String> epsDropArrayAdaptor = new ArrayAdapter<>(AnimeDetailsActivity.this, R.layout.eps_drop_down, epsList);
+                                        epSelection.setAdapter(epsDropArrayAdaptor);
+                                        epSelection.setText(epsList.get(0), false);
+                                        isReversed = false;
+                                        Log.v("AnimeDetailsActivity", "Sorted List: " + epsList);
+                                    }
+                                    if (!playBtn.getText().toString().replace("Play EP ", "").equals(epsList.get(0))) {
+                                        fetchDownloadLink(epsList.get(0).replace("Episode ", ""));
+                                    }
+                                }
+                            });
+
+                        }else {
+                            epSelection.setText("Coming Soon!!");
+                            epSelection.setClickable(false);
+                            playBtn.setText("Coming Soon!!");
+                            downloadBtn.setText("Coming Soon!!");
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<AniApiTotalEpisodesCallModel> call, @NonNull Throwable t) {
+
+            }
+        });
     }
 
     private void playVideo(String videoUrl){
@@ -367,59 +494,69 @@ public class AnimeDetailsActivity extends AppCompatActivity {
         ytVideo.stopPlayback();
     }
 
-    private void getDownloadLink(String anime_id, String epNum, String epLink) {
-        Log.d("TAG","anime_id: "+anime_id);
+    private void fetchDownloadLink(String targetEp) {
+        Log.d("TAG","anime_id: "+animeMongo.getGogoVcID());
 
         playBtn.setText("Loading..");
         downloadBtn.setText("Loading..");
-        String currentActivity = getIntent().getStringExtra("activity_name");
 
         downloadBtn.setBackgroundTintList(ContextCompat.getColorStateList(AnimeDetailsActivity.this, R.color.cardview_dark_background));
         playBtn.setBackgroundTintList(ContextCompat.getColorStateList(AnimeDetailsActivity.this, R.color.cardview_dark_background));
-        targetEp = epNum;
-
-        if (getIntent().getStringExtra("activity_name").equals("recent_release")) {
-            if (getIntent().getStringExtra("current_domain").equals("vc") || getIntent().getStringExtra("current_domain").equals("pe")) {
-                String gg_id = getIntent().getStringExtra("ep_link").replace("-episode-" + currentEp, "").replace("/", "");
-                fetchDownloadLink(gg_id, "search_activity", epLink);
-            }else {
-                fetchDownloadLink(anime_id, currentActivity, epLink);
-            }
-        }else {
-            fetchDownloadLink(anime_id, currentActivity, epLink);
-        }
-
-    }
-
-    private void fetchDownloadLink(String anime_id, String currentActivity, String epLink) {
-        Call<AniApiDownloadModel> aniApiDownloadModelCall = aniWatchApiService.videoLink(anime_id, targetEp, currentActivity, epLink.replace("https://gogoanime.app/anime/",""));
+        Call<AniApiDownloadModel> aniApiDownloadModelCall = aniWatchApiService.getVideoLink(animeMongo.getGogoVcID(), targetEp);
 
         aniApiDownloadModelCall.enqueue(new Callback<AniApiDownloadModel>() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onResponse(@NonNull Call<AniApiDownloadModel> call, @NonNull Response<AniApiDownloadModel> response) {
                 AniApiDownloadModel result = response.body();
-                assert result != null;
-                if(result.getDl_link().contains("/app/fetch_dl_link.sh: 16: printf: usage: printf format [arg ...]\\n")
-                        || result.getDl_link().contains("/app/fetch_dl_link.sh:") || result.getDl_link().equals("n/a")) {
-                    Log.d("TAG", "Error Getting Link search id: "+animeName);
+
+                try {
+                    if (result != null) {
+                        Log.d("TAG", "Link: " + result.getDl_link());
+
+                        if (result.getDl_link().contains("/app/fetch_dl_link.sh: 16: printf: usage: printf format [arg ...]\\n")
+                                || result.getDl_link().contains("/app/fetch_dl_link.sh:") || result.getDl_link().equals("n/a")) {
+                            Log.d("TAG", "Error Getting Link id: " + animeMongo.getGogoVcID());
+                            Toast.makeText(AnimeDetailsActivity.this, "Error Getting Link", Toast.LENGTH_SHORT).show();
+                            downloadBtn.setClickable(false);
+                            playBtn.setClickable(false);
+                            downloadBtn.setText("No Link Found");
+                            playBtn.setText("No Link Found");
+                        }else if (result.getDl_link().contains("https://streamsb.com")){
+                            Toast.makeText(AnimeDetailsActivity.this, "Trying again", Toast.LENGTH_SHORT).show();
+                            downloadBtn.setClickable(false);
+                            playBtn.setClickable(false);
+                            fetchDownloadLink(targetEp);
+                        }else {
+                            videoLink = result.getDl_link();
+                            Log.d("TAG", "videoLink: " + videoLink);
+
+                            if (!videoLink.equals("null")) {
+                                if (videoLink.contains("https://storage.cloud.google.com")) {
+                                    Toast.makeText(AnimeDetailsActivity.this, "Alt link Found please contact me with anime name", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Log.d("TAG", "Video URL: " + videoLink);
+                                    activateBtn(videoLink, targetEp);
+                                }
+                            }
+                        }
+                    }else {
+                        Toast.makeText(AnimeDetailsActivity.this, "Error Getting Link", Toast.LENGTH_SHORT).show();
+                        downloadBtn.setClickable(false);
+                        playBtn.setClickable(false);
+                        downloadBtn.setText("No Link Found");
+                        playBtn.setText("No Link Found");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+
                     Toast.makeText(AnimeDetailsActivity.this, "Error Getting Link", Toast.LENGTH_SHORT).show();
                     downloadBtn.setClickable(false);
                     playBtn.setClickable(false);
                     downloadBtn.setText("No Link Found");
                     playBtn.setText("No Link Found");
-                }else {
-                    videoLink = result.getDl_link();
-                    Log.d("TAG", "videoLink: " + videoLink);
 
-                    if (!videoLink.equals("null")) {
-                        if (videoLink.contains("https://storage.cloud.google.com")) {
-                            Toast.makeText(AnimeDetailsActivity.this, "Alt link Found please contact me with anime name", Toast.LENGTH_SHORT).show();
-                        } else if (videoLink.contains("https://storage.googleapis.com")) {
-                            Log.d("TAG", "alt URL: " + videoLink);
-                            activateBtn(videoLink, epLink);
-                        }
-                    }
+
                 }
             }
 
@@ -430,9 +567,7 @@ public class AnimeDetailsActivity extends AppCompatActivity {
         });
     }
 
-
-
-    private void activateBtn(String download_link, String epLink) {
+    private void activateBtn(String download_link,String targetEp) {
         playBtn.setClickable(true);
         downloadBtn.setClickable(true);
 
@@ -443,57 +578,17 @@ public class AnimeDetailsActivity extends AppCompatActivity {
         downloadBtn.setText("Download EP "+targetEp);
 
         playBtn.setOnClickListener(view -> {
-            String anime_id;
-            if(fromActivity.equals("recent_release")){
-                anime_id = slug;
-            }else {
-                anime_id = animeName;
-            }
-            if (anime_id != null) {
-                PlayerActivityDataModel playerActivityDataModel = new PlayerActivityDataModel(anime_id, download_link, targetEp, totalEps, fromActivity, epLink);
-                Intent playerActivity = new Intent(AnimeDetailsActivity.this, VideoPlayerActivity.class);
-                playerActivity.putExtra("playerData", playerActivityDataModel);
-                startActivity(playerActivity);
-            }else {
-                Toast.makeText(AnimeDetailsActivity.this, "Debug anime_id is null Playing in alt player", Toast.LENGTH_SHORT).show();
 
-                //                boolean vlcFound = isAppInstalled(AnimeDetailsActivity.this, "org.videolan.vlc");
-//                if (vlcFound) {
-//
-//                    Log.d("LOG","Video Link: "+videoLink);
-//                    try {
-//                        Intent vlcIntent = new Intent(Intent.ACTION_VIEW);
-//                        vlcIntent.setPackage("org.videolan.vlc");
-//                        vlcIntent.setDataAndTypeAndNormalize(download_link, "video/*");
-//                        vlcIntent.putExtra("title", animeName.replace("-", " ") + " Ep " + targetEp);
-//                        vlcIntent.putExtra("from_start", false);
-//                        vlcIntent.setComponent(new ComponentName("org.videolan.vlc", "org.videolan.vlc.gui.video.VideoPlayerActivity"));
-//                        startActivity(vlcIntent);
-//                    }catch (Exception e){
-//                        Intent intent = new Intent(Intent.ACTION_VIEW,download_link);
-//                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                        intent.setPackage("com.android.chrome");
-//                        try {
-//                            startActivity(intent);
-//                        } catch (ActivityNotFoundException ex) {
-//                            intent.setPackage("org.mozilla.firefox");
-//                            startActivity(intent);
-//                        }
-//                    }
-//                }
-//                else {
-//                    Intent playVideo = new Intent(Intent.ACTION_VIEW);
-//                    playVideo.setDataAndType(Uri.parse(videoLink), "video/mp4");
-//                    playVideo.putExtra("title", animeName.replace("-", " ")+" Ep "+targetEp);
-//                    startActivity(playVideo);
-//                }
-            }
+            PlayerActivityDataModel playerActivityDataModel = new PlayerActivityDataModel(animeMongo.getGogoVcID(),
+                    download_link, targetEp, totalEps, animeMongo.getTitleName(), 0);
+            Intent playerActivity = new Intent(AnimeDetailsActivity.this, VideoPlayerActivity.class);
+            playerActivity.putExtra("playerData", playerActivityDataModel);
+            startActivity(playerActivity);
 
         });
 
         downloadBtn.setOnClickListener(view -> {
             if(!videoLink.equals("null")) {
-
                 if(checkPermission()){
                     setDownload();
                 }else{
@@ -564,9 +659,8 @@ public class AnimeDetailsActivity extends AppCompatActivity {
 
 
     void setDownload(){
-        FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(AnimeDetailsActivity.this).setNamespace(DownloadsActivity.FETCH_NAMESPACE).build();
-        Fetch fetch = Fetch.Impl.getInstance(fetchConfiguration);
 
+        Fetch fetch = Fetch.Impl.getDefaultInstance();
         String fileName = showTitle.getText().toString()+downloadBtn.getText().toString().replace("Download "," ")+".mp4";
 
         Request request = new Request(videoLink, "/storage/emulated/0/AniWatch/" + showTitle.getText() + "/" + fileName);

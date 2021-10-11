@@ -16,9 +16,12 @@
         tools:ignore="ContentDescription,HardcodedText" />
 
     <TextView
+        android:textStyle="bold"
         android:id="@+id/vidTitle"
         android:layout_marginTop="5dp"
         android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Episode number"

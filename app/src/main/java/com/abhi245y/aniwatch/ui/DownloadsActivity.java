@@ -23,9 +23,7 @@ import com.tonyodev.fetch2.Fetch;
 import com.tonyodev.fetch2.FetchConfiguration;
 import com.tonyodev.fetch2.FetchListener;
 import com.tonyodev.fetch2.NetworkType;
-import com.tonyodev.fetch2core.Downloader;
 import com.tonyodev.fetch2core.Func;
-import com.tonyodev.fetch2okhttp.OkHttpDownloader;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,11 +34,8 @@ import java.util.List;
 @SuppressLint("SetTextI18n")
 public class DownloadsActivity extends AppCompatActivity implements ActionListener {
 
-    private static final int STORAGE_PERMISSION_CODE = 200;
     private static final long UNKNOWN_REMAINING_TIME = -1;
     private static final long UNKNOWN_DOWNLOADED_BYTES_PER_SECOND = 0;
-    private static final int GROUP_ID = "listGroup".hashCode();
-    static final String FETCH_NAMESPACE = "DownloadsActivity";
 
     View mainView;
     FileAdapter fileAdapter;
@@ -52,12 +47,7 @@ public class DownloadsActivity extends AppCompatActivity implements ActionListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_donwloads);
         setUpViews();
-        final FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
-                .setDownloadConcurrentLimit(10)
-                .setHttpDownloader(new OkHttpDownloader(Downloader.FileDownloaderType.PARALLEL))
-                .setNamespace(FETCH_NAMESPACE)
-                .build();
-        fetch = Fetch.Impl.getInstance(fetchConfiguration);
+        fetch = Fetch.Impl.getDefaultInstance();
         fetch.setGlobalNetworkType(NetworkType.ALL);
         fetchDownloads();
     }
@@ -90,7 +80,6 @@ public class DownloadsActivity extends AppCompatActivity implements ActionListen
     @Override
     protected void onPause() {
         super.onPause();
-        fetch.removeListener(fetchListener);
     }
 
     @Override
@@ -188,8 +177,8 @@ public class DownloadsActivity extends AppCompatActivity implements ActionListen
 
     private void deleteDownloadedFiles() {
 
-        final FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this).setNamespace(FETCH_NAMESPACE).build();
-        Fetch.Impl.getInstance(fetchConfiguration).deleteAll().close();
+        final FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this).setNamespace(AniWatch.FETCH_NAMESPACE).build();
+        Fetch.Impl.getDefaultInstance().deleteAll().close();
 
         try {
             final File fetchDir = new File("/storage/emulated/0/AniWatch/");

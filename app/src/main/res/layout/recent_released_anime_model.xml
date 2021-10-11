@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/ani_cover_img"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="180dp"
         tools:ignore="ContentDescription" />
 
    <LinearLayout
@@ -24,13 +24,15 @@
            android:layout_height="wrap_content"
            android:text="TextView"
            android:padding="3dp"
-           android:gravity="center"/>
+           android:gravity="center"
+           android:ellipsize="marquee"
+           android:maxLines="2" />
+
 
        <TextView
            android:id="@+id/ani_released_ep_tv"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:text="Ep TextView"
            android:padding="3dp"
            android:gravity="center"/>
    </LinearLayout>

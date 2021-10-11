@@ -10,16 +10,16 @@ import lombok.Data;
 @Data
 public class PlayerActivityDataModel implements Parcelable {
 
-    String animeId, currentEpLink, currentEpNum, totalEp, fromActivity, epGogoLink;
-
+    String animeId, currentEpLink, currentEpNum, totalEp, titleName;
+    long lastPlaybackPos;
 
     protected PlayerActivityDataModel(Parcel in) {
         animeId = in.readString();
         currentEpLink = in.readString();
         currentEpNum = in.readString();
         totalEp = in.readString();
-        fromActivity = in.readString();
-        epGogoLink = in.readString();
+        titleName = in.readString();
+        lastPlaybackPos = in.readLong();
     }
 
     public static final Creator<PlayerActivityDataModel> CREATOR = new Creator<PlayerActivityDataModel>() {
@@ -45,7 +45,7 @@ public class PlayerActivityDataModel implements Parcelable {
         parcel.writeString(currentEpLink);
         parcel.writeString(currentEpNum);
         parcel.writeString(totalEp);
-        parcel.writeString(fromActivity);
-        parcel.writeString(epGogoLink);
+        parcel.writeString(titleName);
+        parcel.writeLong(lastPlaybackPos);
     }
 }

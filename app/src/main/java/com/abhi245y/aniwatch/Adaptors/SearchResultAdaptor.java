@@ -13,9 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.abhi245y.aniwatch.R;
+import com.abhi245y.aniwatch.datamodels.AnimeMongo;
 import com.abhi245y.aniwatch.datamodels.SearchViewModel;
 import com.abhi245y.aniwatch.ui.AnimeDetailsActivity;
 import com.bumptech.glide.Glide;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
 
@@ -37,13 +39,31 @@ public class SearchResultAdaptor extends RecyclerView.Adapter<SearchResultAdapto
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.search_rv_model, parent, false));
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        SearchViewModel searchViewModel = searchViewModels.get(position);
-        Glide.with(context).load(searchViewModel.getPoster_link()).into(holder.poster_image);
-        holder.result_name.setText(searchViewModel.getAnime_name());
-        holder.total_eps.setText("Total Episodes: "+searchViewModel.getTotal_ep());
+        AnimeMongo animeMongo = searchViewModels.get(position).getAnimeMongo();
+        Glide.with(context).load(animeMongo.getImgLink()).fitCenter().into(holder.poster_image);
+        String titleName = animeMongo.getTitleName();
+        holder.result_name.setText(titleName);
+        String released = "Released: "+animeMongo.getReleased();
+        if(animeMongo.getOtherNamesList().size()>2) {
+            holder.otherNames.setText(animeMongo.getOtherNamesList().get(0));
+        }
+        holder.release_year.setText(released);
+
+        String genres =  animeMongo.getGenre().toString().replace("[","").replace("]","");
+        String otherNames =  animeMongo.getOtherNames().replace("[","").replace("]","");
+        holder.genresTv.setText(genres);
+        holder.otherNames.setText(otherNames);
+
+//        for(int i = 0; i<=5; i++){
+//            if (i<animeMongo.getGenre().size()) {
+//                String genre = animeMongo.getGenre().get(i);
+//                Chip chip = new Chip(context);
+//                chip.setText(genre);
+//                holder.genreChipGroup.addView(chip);
+//            }
+//        }
 
     }
 
@@ -54,27 +74,25 @@ public class SearchResultAdaptor extends RecyclerView.Adapter<SearchResultAdapto
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView poster_image;
-        public TextView result_name, total_eps;
+        public TextView result_name, release_year, otherNames, genresTv;
+        public ChipGroup genreChipGroup;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             result_name = itemView.findViewById(R.id.result_name);
             poster_image = itemView.findViewById(R.id.poster_img);
-            total_eps = itemView.findViewById(R.id.tEps);
+            release_year = itemView.findViewById(R.id.release_date);
+            genreChipGroup = itemView.findViewById(R.id.genreChipGroup);
+            otherNames = itemView.findViewById(R.id.other_names);
+            genresTv = itemView.findViewById(R.id.genres);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    SearchViewModel searchViewModel = searchViewModels.get(getAdapterPosition());
-                    Intent intent = new Intent(context, AnimeDetailsActivity.class);
-                    intent.putExtra("anime_name", searchViewModel.getGogo_id());
-                    intent.putExtra("total_ep", String.valueOf(searchViewModel.getTotal_ep()));
-                    intent.putExtra("current_ep", "1");
-                    intent.putExtra("activity_name", "search_activity");
-                    intent.putExtra("poster_link", searchViewModel.getPoster_link());
-                    context.startActivity(intent);
-                }
+            itemView.setOnClickListener(view -> {
+                SearchViewModel searchViewModel = searchViewModels.get(getBindingAdapterPosition());
+                Intent animeDetails = new Intent(context, AnimeDetailsActivity.class);
+                animeDetails.putExtra("animeData", searchViewModel.getAnimeMongo());
+                animeDetails.putExtra("current_ep", "1");
+                context.startActivity(animeDetails);
             });
 
         }

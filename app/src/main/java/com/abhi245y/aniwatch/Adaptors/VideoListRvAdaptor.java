@@ -1,5 +1,6 @@
 package com.abhi245y.aniwatch.Adaptors;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,9 +21,11 @@ public class VideoListRvAdaptor extends RecyclerView.Adapter<VideoListRvAdaptor.
     ArrayList<EpisodesListRVDataModel> episodesListRVDataModelArrayList;
     Context context;
 
+    @SuppressLint("NotifyDataSetChanged")
     public VideoListRvAdaptor(ArrayList<EpisodesListRVDataModel> episodesListRVDataModelArrayList, Context context) {
         this.episodesListRVDataModelArrayList = episodesListRVDataModelArrayList;
         this.context = context;
+        notifyDataSetChanged();
     }
 
     @NonNull
