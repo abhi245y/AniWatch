@@ -8,6 +8,13 @@ A feature-rich Android application for streaming anime content, inspired by the 
 
 AniWatch provides anime enthusiasts with a seamless streaming experience, featuring a modern interface that combines YouTube's familiar navigation with Netflix's content discovery approach. The app aggregates anime content from multiple sources and presents it in an intuitive, user-friendly manner.
 
+🖼️ User Interface Screenshots
+------------------------------
+
+| Home Screen (Recent Releases) | Anime Details Screen | Watch History Screen | 
+|----------------|---------------------|-------------------|
+|![Recent Releases](screenshots/recent-releases-screenshot.jpeg)|![Anime Details](screenshots/anime-details-screenshot.jpeg)| ![Watch History](screenshots/history-screenshot.jpeg) |
+
 ✨ Key Features
 --------------
 
